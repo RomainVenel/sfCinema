@@ -23,7 +23,7 @@ class ApiService
             [
                 'headers' => [
                     'Content-Type' => 'application/json',
-                    'X-RapidAPI-Key' => '754237601amsh09f935cdb5ffcbfp1d2043jsn05080faa1d70',
+                    'X-RapidAPI-Key' => '',
                     'X-RapidAPI-Host' => 'imdb8.p.rapidapi.com'
                 ],
                 'query' => [

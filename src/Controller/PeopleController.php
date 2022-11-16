@@ -7,6 +7,7 @@ use App\Form\PeopleType;
 use App\Repository\MovieRepository;
 use App\Repository\PeopleRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -101,7 +102,7 @@ class PeopleController extends AbstractController
     private function checkSession(Request $request) {
 
         if (!$request->getSession()->has('user')) {
-            throw new AccessDeniedException('Accès interdit');
+            throw new AccessDeniedException('Access denied');
         }
     }
 }

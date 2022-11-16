@@ -6,7 +6,6 @@ use App\Entity\Movie;
 use App\Form\MovieType;
 use App\Repository\MovieRepository;
 use App\Repository\PeopleRepository;
-use App\Service\ApiService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Finder\Exception\AccessDeniedException;
@@ -25,6 +24,11 @@ class MovieController extends AbstractController
             'page' => $page,
         ]);
         $movies = json_decode($movies->getContent(), true);
+
+        if (empty($movies)) {
+            throw $this->createNotFoundException('Not found');
+        }
+
         $finalMovies['pages'] = $movies['pages'];
         $finalMovies['page'] = $movies['page'];
         $finalMovies['limit'] = $movies['limit'];
@@ -44,7 +48,8 @@ class MovieController extends AbstractController
         return $this->render('movie/index.html.twig', [
             'movies' => $finalMovies,
             'connected' => $request->getSession()->has('user'),
-            'connectedData' => $connectedData
+            'connectedData' => $connectedData,
+            'apiKey' => $this->getParameter('app.apikey'),
         ]);
     }
 
@@ -128,10 +133,11 @@ class MovieController extends AbstractController
         return $this->redirectToRoute('movie_list');
     }
 
+    // Check si un utilisateur est connecté sinon renvoi d'une exception
     private function checkSession(Request $request) {
 
         if (!$request->getSession()->has('user')) {
-            throw new AccessDeniedException('Accès interdit');
+            throw new AccessDeniedException('Access denied');
         }
     }
 }
