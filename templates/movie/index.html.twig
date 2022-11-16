@@ -1,0 +1,122 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Movie index{% endblock %}
+
+{% block body %}
+    <div class="header">
+        <h1>Liste des films</h1>
+    </div>
+    <div id="userChoice">
+        <div id="registerChoice">
+            <a class="btn btnRegister" href="{{ path('register') }}">S'inscrire</a>
+        </div>
+        <div class="btn" id="connexionChoice">
+            {% if connected %}
+                <a class="btn btnLogout" href="{{ path('logout') }}">Se déconnecter</a>
+            {% else %}
+                <a class="btn btnConnexion" href="{{ path('connexion') }}">Se connecter</a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if connected %}
+        <div class="welcome">Bienvenue {{ connectedData['firstname'] ~ ' ' ~ connectedData['lastname'] }}</div>
+        <div class="btnModif">
+            <a class="btn btnAdd" href="{{ path('movie_new') }}">Ajouter un film</a>
+            <a class="btn btnAdd actorAdd" href="{{ path('people_new') }}">Ajouter un acteur</a>
+        </div>
+    {% endif %}
+
+    {% set path = 'movie_list' %}
+    {% set pages = movies.pages %}
+    {% set currentPage = movies.page %}
+    <div class="cards">
+        {% for movie in movies.data %}
+            <div class="card" data-id="{{ movie.id }}">
+                <img src="" class="card-image" alt="" />
+                <div class="card-overlay">
+                    <div class="card-header">
+                        <svg class="card-arc" xmlns="http://www.w3.org/2000/svg"><path /></svg>
+                        <div class="card-desc">
+                            <h3 class="card-title">{{ movie.title }}</h3>
+                            <span class="card-status">Durée : {{ (movie.duration / 60)|round(0, 'floor') }}h {{ (movie.duration % 60) is not same as(0) ? movie.duration % 60 ~ 'm': '' }}</span>
+                        </div>
+                     </div>
+                </div>
+            </div>
+            <div data-id="{{ movie.id }}" class="card-infos" style="display: none;">
+                <div class="genres">
+                    <h4 class="card-title-genre">{{ movie.type|length > 0 ? (movie.type|length > 1 ? 'Genres:' : 'Genre:') : 'Genre:'  }}</h4>
+                    {% for t in movie.type %}
+                        <div class="card-genre">{{ t.name }} <i class="fas fa-film"></i></div>
+                    {% endfor %}
+                </div>
+                <div class="people">
+                    <h4 class="card-title-people">{{ movie.people|length > 1 ? 'Acteurs:' : 'Acteur:' }}</h4>
+                    {% for p in movie.people %}
+                        <div class="card-people">{{ p.firstname ~ ' ' ~ p.lastname }}</i></div>
+                    {% endfor %}
+                </div>
+                <a href="{{ path('movie_edit', {'id': movie.id}) }}">Editer</a>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="return">
+        <button type="button" class="btn btnConnexion">Retour</button>
+    </div>
+    {% include 'paginator/paginator.html.twig' %}
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script type="text/javascript" src="{{ asset('js/pagination.js') }}"></script>
+    <script>
+
+        {% for movie in movies.data %}
+            fetch("https://online-movie-database.p.rapidapi.com/title/find?q={{ movie.title }}", {
+                "method": "GET",
+                "headers": {
+                    'X-RapidAPI-Key': '754237601amsh09f935cdb5ffcbfp1d2043jsn05080faa1d70',
+                    'X-RapidAPI-Host': 'imdb8.p.rapidapi.com'
+                },
+                'query': {
+                    'q': '{{ movie.title }}',
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const list = data.results;
+
+                    list.some((item) => {
+                        if (item.image) {
+                            $('.card[data-id=' + {{ movie.id }} + '] img').attr('src', `${item.image.url}`);
+                            return true;
+                        }
+                    })
+                })
+                .catch(err => {
+                    console.error(err);
+                });
+        {% endfor %}
+
+        $('#pagination').twbsPagination({
+            totalPages: {{ pages }},
+            visiblePages: 7,
+            startPage: {{ currentPage }}
+        }).on('page', function (event, page) {
+            window.location.href = '?page=' + page;
+        });
+
+        $('.card').click(function() {
+            let id = $(this).attr('data-id');
+            $('.card').hide();
+            $(this).show();
+            $('.card-infos[data-id=' + id + ']').show();
+            $(this).animate({'margin-left': '50'}, 'slow');
+            $(this).css('width', 400);
+            $('nav').hide();
+            $('.return').css('display', 'flex');
+        });
+
+        $('.return').click(function() {
+           location.reload();
+        });
+    </script>
+{% endblock %}

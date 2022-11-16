@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block body %}
+
+    <div class="formControl">
+        {% if failed is defined %}
+            <div class="failedMessage">{{ failed }}</div>
+        {% endif %}
+        <div class="formConnexion">
+            {{ form(form) }}
+        </div>
+    </div>
+
+{% endblock %}
