@@ -15,12 +15,16 @@ Modifier DATABASE_URL en fonction des paramètres de notre bdd
 Rajouter sa clé api comme variable d'environnement dans la variable APP_APIKEY dans le fichier .env
 ```
 
-##  <a name='CreateanewUser'></a>Lancer la migration de la bdd
-
-Il est possible de le faire via Docker
+##  <a></a>Lancer la migration de la bdd
 
 ```bash
 php bin/console d:m:m
+```
+
+##  <a></a>Composer
+
+```bash
+composer install
 ```
 
 Si l'application est installé sur le port 8000
